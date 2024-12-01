@@ -1,11 +1,16 @@
 import { useEffect, useState } from "react";
 import Navbar from "./components/Navbar";
 import { themeChange } from "theme-change";
+import { database } from "./firebase";
+import { DataSnapshot, onValue, ref } from "firebase/database";
 
 const cardClasses = "card bg-base-100 shadow-md border-accent border";
 
 function App() {
   const [dateTime, setDateTime] = useState(new Date());
+  const [data, setData] = useState<{ temp: string }>({
+    temp: "--",
+  });
 
   useEffect(() => {
     themeChange(false);
@@ -15,6 +20,15 @@ function App() {
       setDateTime(date);
     }, 1000);
 
+    const tempRef = ref(database, "temp");
+    onValue(tempRef, (snapshot: DataSnapshot) => {
+      const data = snapshot.val();
+      setData((prev) => {
+        return { ...prev, temp: data };
+      });
+    });
+
+    
     return () => clearInterval(interval);
   }, []);
   return (
@@ -34,7 +48,7 @@ function App() {
         <div className={cardClasses}>
           <div className="card-body">
             <h2 className="card-title font-normal text-2xl">Temperature</h2>
-            <p className="text-4xl">-- °C</p>
+            <p className="text-4xl">{data.temp} °C</p>
           </div>
         </div>
 
