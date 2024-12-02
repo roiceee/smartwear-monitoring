@@ -8,8 +8,16 @@ const cardClasses = "card bg-base-100 shadow-md border-accent border";
 
 function App() {
   const [dateTime, setDateTime] = useState(new Date());
-  const [data, setData] = useState<{ temp: string }>({
-    temp: "--",
+  const [data, setData] = useState<{
+    temperature: number;
+    humidity: number;
+    wbgt: number;
+    irradiance: number;
+  }>({
+    temperature: 0,
+    humidity: 0,
+    wbgt: 0,
+    irradiance: 0,
   });
 
   useEffect(() => {
@@ -20,15 +28,38 @@ function App() {
       setDateTime(date);
     }, 1000);
 
-    const tempRef = ref(database, "temp");
+    const tempRef = ref(database, "temperature");
     onValue(tempRef, (snapshot: DataSnapshot) => {
       const data = snapshot.val();
       setData((prev) => {
-        return { ...prev, temp: data };
+        return { ...prev, temperature: data };
       });
     });
 
-    
+    const humidityRef = ref(database, "humidity");
+    onValue(humidityRef, (snapshot: DataSnapshot) => {
+      const data = snapshot.val();
+      setData((prev) => {
+        return { ...prev, humidity: data };
+      });
+    });
+
+    const wbgtRef = ref(database, "wbgt");
+    onValue(wbgtRef, (snapshot: DataSnapshot) => {
+      const data = snapshot.val();
+      setData((prev) => {
+        return { ...prev, wbgt: data };
+      });
+    });
+
+    const irradianceRef = ref(database, "irradiance");
+    onValue(irradianceRef, (snapshot: DataSnapshot) => {
+      const data = snapshot.val();
+      setData((prev) => {
+        return { ...prev, irradiance: data };
+      });
+    });
+
     return () => clearInterval(interval);
   }, []);
   return (
@@ -48,7 +79,7 @@ function App() {
         <div className={cardClasses}>
           <div className="card-body">
             <h2 className="card-title font-normal text-2xl">Temperature</h2>
-            <p className="text-4xl">{data.temp} °C</p>
+            <p className="text-4xl">{data.temperature} °C</p>
           </div>
         </div>
 
@@ -58,7 +89,7 @@ function App() {
             <h2 className="card-title font-normal text-2xl">
               Specific Humidity
             </h2>
-            <p className="text-4xl">-- g/kg</p>
+            <p className="text-4xl">{data.humidity}</p>
           </div>
         </div>
 
@@ -66,7 +97,7 @@ function App() {
         <div className={cardClasses}>
           <div className="card-body">
             <h2 className="card-title font-normal text-2xl">Irradiance</h2>
-            <p className="text-4xl">-- W/m²</p>
+            <p className="text-4xl">{data.irradiance}</p>
           </div>
         </div>
 
@@ -74,7 +105,7 @@ function App() {
         <div className={cardClasses}>
           <div className="card-body">
             <h2 className="card-title font-normal text-2xl">WBGT</h2>
-            <p className="text-4xl">-- °C</p>
+            <p className="text-4xl">{data.wbgt} °C</p>
           </div>
         </div>
 
@@ -91,7 +122,7 @@ function App() {
 
       {/* Footer */}
       <footer className="border-t text-center py-8">
-        <div>© 2024 SmartWear. All rights reserved.</div>
+        <div>© 2024 HeatStress. All rights reserved.</div>
       </footer>
     </main>
   );

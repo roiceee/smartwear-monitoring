@@ -3,7 +3,7 @@ export default function Navbar() {
     <div className="navbar bg-base-100 border-b z-50">
       <div className="flex-1">
         <a className="btn btn-ghost text-xl hidden sm:flex">
-          SmartWear Monitoring System
+          HeatStress Monitoring System
         </a>
         <a className="btn btn-ghost text-xl flex sm:hidden">SWM</a>
       </div>
