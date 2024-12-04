@@ -1,10 +1,34 @@
-import { useEffect, useState } from "react";
-import Navbar from "./components/Navbar";
-import { themeChange } from "theme-change";
-import { database } from "./firebase";
 import { DataSnapshot, onValue, ref } from "firebase/database";
+import { useEffect, useState } from "react";
+import { themeChange } from "theme-change";
+import Navbar from "./components/Navbar";
+import { database } from "./firebase";
 
 const cardClasses = "card bg-base-100 shadow-md border-accent border";
+
+const getStressLevel = (
+  wbgt: number
+):
+  | "No Heat"
+  | "Low Heat"
+  | "Moderate Heat"
+  | "High Heat"
+  | "Severe Heat"
+  | "Critical Risk" => {
+  if (wbgt < 18) {
+    return "No Heat";
+  } else if (wbgt == 18) {
+    return "Low Heat";
+  } else if (wbgt < 23) {
+    return "Moderate Heat";
+  } else if (wbgt < 28) {
+    return "High Heat";
+  } else if (wbgt < 30) {
+    return "Severe Heat";
+  } else {
+    return "Critical Risk";
+  }
+};
 
 function App() {
   const [dateTime, setDateTime] = useState(new Date());
@@ -13,11 +37,13 @@ function App() {
     humidity: number;
     wbgt: number;
     irradiance: number;
+    stressLevel: string;
   }>({
     temperature: 0,
     humidity: 0,
     wbgt: 0,
     irradiance: 0,
+    stressLevel: "",
   });
 
   useEffect(() => {
@@ -47,8 +73,9 @@ function App() {
     const wbgtRef = ref(database, "wbgt");
     onValue(wbgtRef, (snapshot: DataSnapshot) => {
       const data = snapshot.val();
+
       setData((prev) => {
-        return { ...prev, wbgt: data };
+        return { ...prev, wbgt: data, stressLevel: getStressLevel(data) };
       });
     });
 
@@ -79,7 +106,7 @@ function App() {
         <div className={cardClasses}>
           <div className="card-body">
             <h2 className="card-title font-normal text-2xl">Temperature</h2>
-            <p className="text-4xl">{data.temperature} °C</p>
+            <p className="text-4xl">{data.temperature}</p>
           </div>
         </div>
 
@@ -105,7 +132,7 @@ function App() {
         <div className={cardClasses}>
           <div className="card-body">
             <h2 className="card-title font-normal text-2xl">WBGT</h2>
-            <p className="text-4xl">{data.wbgt} °C</p>
+            <p className="text-4xl">{data.wbgt}</p>
           </div>
         </div>
 
@@ -115,7 +142,22 @@ function App() {
             <h2 className="card-title font-normal text-2xl">
               Thermal Stress Level
             </h2>
-            <p className="text-4xl">--</p>
+            <p
+              className={`text-4xl ${
+                data.stressLevel === "Critical Risk"
+                  ? "text-red-500"
+                  : data.stressLevel === "Severe Heat"
+                  ? "text-red-500"
+                  : data.stressLevel === "High Heat"
+                  ? "text-yellow-500"
+                  : data.stressLevel === "Moderate Heat"
+                  ? "text-green-500"
+                  : "text-blue-500"
+              }
+            `}
+            >
+              {data.stressLevel}
+            </p>
           </div>
         </div>
       </div>
