@@ -1,7 +1,3 @@
-Here's your README for **Smartwear Monitoring**:  
-
----
-
 # Smartwear Monitoring  
 
 ## Overview  
